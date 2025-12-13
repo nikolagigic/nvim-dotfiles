@@ -69,7 +69,12 @@ return {
         nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
         nmap("gr", vim.lsp.buf.references, "[G]oto [R]eferences")
         nmap("<leader>f", function()
-          vim.lsp.buf.format({ async = true })
+          local ok, conform = pcall(require, "conform")
+          if ok and conform then
+            conform.format({ async = true, lsp_fallback = true })
+          else
+            vim.lsp.buf.format({ async = true })
+          end
         end, "[F]ormat code")
       end
 

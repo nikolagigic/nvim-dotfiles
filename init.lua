@@ -47,6 +47,19 @@ vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to bottom window" })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to top window" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
 
+-- Replace word under cursor
+vim.keymap.set("n", "<C-d>w", function()
+  local word = vim.fn.expand("<cword>")
+  vim.ui.input({ prompt = "Replace '" .. word .. "' with: " }, function(input)
+    if input then
+      vim.cmd("%s/\\<" .. vim.fn.escape(word, "/\\") .. "\\>/" .. vim.fn.escape(input, "/\\") .. "/gc")
+    end
+  end)
+end, { desc = "Replace word under cursor" })
+
+-- Clear search highlighting with Esc in normal mode
+vim.keymap.set("n", "<Esc>", ":noh<CR>", { desc = "Clear search highlighting" })
+
 -- Ensure colorscheme loads (fallback if plugin config doesn't run)
 vim.api.nvim_create_autocmd("User", {
   pattern = "VeryLazy",
