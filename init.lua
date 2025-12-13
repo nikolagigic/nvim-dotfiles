@@ -31,11 +31,15 @@ vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = false })
 vim.keymap.set("n", "dd", [["_dd]])
 vim.keymap.set("n", "d", [["_d]])
 vim.keymap.set("v", "d", [["_d]])
--- You might also want to do the same for 'x' and 'c' commands
-vim.keymap.set("n", "x", [["_x]])
-vim.keymap.set("v", "x", [["_x]])
-vim.keymap.set("n", "c", [["_c]])
-vim.keymap.set("v", "c", [["_c]])
+
+-- Make 'x' behave like 'y' but cut (delete and yank)
+-- 'x' now works as a cut operator with motions: xw (cut word), x$ (cut to end), etc.
+-- 'xx' cuts the current line (like 'yy' yanks it)
+vim.keymap.set("n", "x", "d", { desc = "Cut operator (works like y but cuts)" })
+vim.keymap.set("n", "xx", "dd", { desc = "Cut current line" })
+vim.keymap.set("v", "x", "d", { desc = "Cut selection" })
+-- Preserve single character delete with 'dl' or use 'X' for backward delete
+vim.keymap.set("n", "X", "X", { desc = "Delete character before cursor" })
 
 -- Neo Tree
 vim.keymap.set("n", "<C-n>", ":Neotree filesystem reveal toggle<CR>")
