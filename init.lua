@@ -6,13 +6,41 @@ vim.api.nvim_set_option("clipboard", "unnamed")
 vim.opt.number = true
 vim.opt.relativenumber = true
 
--- Ensure line numbers are visible
+-- Scroll offset: keep lines above/below cursor for readability
+vim.opt.scrolloff = 8
+
+-- Function to set black background
+local function set_black_background()
+  vim.api.nvim_set_hl(0, "Normal", { bg = "#000000" })
+  vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#000000" })
+  vim.api.nvim_set_hl(0, "NormalNC", { bg = "#000000" })
+  vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "#000000" })
+  vim.api.nvim_set_hl(0, "SignColumn", { bg = "#000000" })
+  vim.api.nvim_set_hl(0, "LineNr", { bg = "#000000" })
+  vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "#000000" })
+end
+
+-- Set black background immediately
+set_black_background()
+
+-- Set black background very early to prevent flash
+vim.api.nvim_create_autocmd("VimEnter", {
+  pattern = "*",
+  callback = function()
+    set_black_background()
+  end,
+  once = true,
+})
+
+-- Ensure line numbers are visible and maintain black background
 vim.api.nvim_create_autocmd("ColorScheme", {
   pattern = "*",
   callback = function()
     -- Force line number visibility
     vim.opt.number = true
     vim.opt.relativenumber = true
+    -- Maintain black background immediately after colorscheme loads
+    set_black_background()
   end,
 })
 
@@ -69,6 +97,8 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "VeryLazy",
   callback = function()
     vim.cmd.colorscheme("cyberdream")
+    -- Set black background immediately after colorscheme loads
+    set_black_background()
   end,
 })
 

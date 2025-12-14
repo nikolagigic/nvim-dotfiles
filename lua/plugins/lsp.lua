@@ -137,6 +137,62 @@ return {
           prefix = "",
         },
       })
+
+      -- Customize hover window (K shortcut) appearance
+      local function setup_hover_highlights()
+        -- Use a distinct background color that contrasts with the editor
+        vim.api.nvim_set_hl(0, "LspFloatWinNormal", {
+          bg = "#1a1a2e",
+          fg = "#ffffff",
+        })
+        vim.api.nvim_set_hl(0, "LspFloatWinBorder", {
+          fg = "#4a9eff",
+          bg = "#1a1a2e",
+        })
+      end
+
+      -- Apply highlights immediately
+      setup_hover_highlights()
+
+      -- Reapply highlights after colorscheme loads
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        pattern = "*",
+        callback = setup_hover_highlights,
+      })
+
+      -- Custom hover handler with better styling
+      vim.lsp.handlers["textDocument/hover"] = function(_, result, ctx, config)
+        config = config or {}
+        config.border = config.border or "rounded"
+        config.max_width = config.max_width or 80
+        config.max_height = config.max_height or 20
+        
+        if not (result and result.contents) then
+          return
+        end
+        local markdown_lines = vim.lsp.util.convert_input_to_markdown_lines(result.contents)
+        markdown_lines = vim.lsp.util.trim_empty_lines(markdown_lines)
+        if vim.tbl_isempty(markdown_lines) then
+          return
+        end
+        
+        -- Add padding by inserting empty lines at top and bottom, and spaces at sides
+        local padded_lines = {}
+        table.insert(padded_lines, "") -- Top padding
+        for _, line in ipairs(markdown_lines) do
+          table.insert(padded_lines, "  " .. line) -- Left padding with 2 spaces
+        end
+        table.insert(padded_lines, "") -- Bottom padding
+        
+        local bufnr, winnr = vim.lsp.util.open_floating_preview(padded_lines, "markdown", config)
+        
+        -- Set window-specific highlights for better visibility
+        if winnr then
+          vim.api.nvim_win_set_option(winnr, "winhighlight", "Normal:LspFloatWinNormal,NormalFloat:LspFloatWinNormal,FloatBorder:LspFloatWinBorder")
+        end
+        
+        return bufnr, winnr
+      end
     end,
   },
 }
